@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06271e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ежедневник">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=Great+Vibes&display=swap" rel="stylesheet">
+<title>Ежедневник</title>
+<style>
+:root{--bg:#06271e;--ink:#fffdf8;--muted:#e7e0d8;--panel:rgba(194,207,193,.25);--line:rgba(242,239,226,.8);--accent:#c9d4c4;--red:#a62e32;--shadow:rgba(255,255,255,.48)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#000}
+body{font-family:'Bodoni Moda','Bodoni 72',Didot,'Times New Roman',serif;color:var(--ink);background:var(--bg);min-height:100vh;padding-bottom:calc(100px + env(safe-area-inset-bottom));}
+body.light{--bg:#fffdf9;--ink:#a52c32;--muted:#9a5353;--panel:rgba(255,255,255,.72);--line:rgba(165,44,50,.72);--accent:#b63a40;--red:#a52c32;--shadow:rgba(130,50,50,.22)}
+button,input{font:inherit}
+.top{height:290px;position:relative;overflow:hidden;text-align:center}
+.botanical{position:absolute;inset:0 0 auto;width:100%;height:205px;object-fit:cover;opacity:.98;pointer-events:none}
+.title{position:absolute;top:105px;left:0;right:0;margin:0;font-family:'Great Vibes','Bodoni Moda',cursive;font-size:65px;font-weight:400;line-height:1.15;color:var(--ink);text-shadow:0 2px 8px #00150f}
+.date-wrap{position:absolute;top:220px;left:7%;right:7%;display:flex;align-items:center;gap:10px}
+.orn-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,var(--line),transparent);position:relative}
+.orn-line:after{content:"✦ ✧ ✦";position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:14px;letter-spacing:2px;white-space:nowrap;color:var(--ink)}
+.date{font-family:'Great Vibes',cursive;font-size:34px;white-space:nowrap;padding:0 12px;text-shadow:0 2px 5px #00150f}
+.theme-switch{position:absolute;right:14px;top:12px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--ink);border-radius:22px;padding:6px 12px;font-size:12px;z-index:2}
+main{width:min(100%,560px);margin:0 auto;padding:0 20px}
+.progress-card{height:220px;border:2px solid rgba(229,229,211,.78);border-radius:76px;background:linear-gradient(110deg,rgba(219,224,212,.24),rgba(160,180,164,.35));box-shadow:inset 0 0 17px rgba(255,255,255,.4),0 0 7px rgba(255,255,255,.3);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:25px 22px;margin:10px 0 28px;position:relative;overflow:hidden}
+.progress-card:before{content:"";position:absolute;inset:0 auto 0 0;width:var(--progress,0%);background:linear-gradient(100deg,rgba(208,222,202,.12),rgba(217,230,209,.36));border-right:1px solid rgba(255,255,255,.12);transition:width .3s}
+.progress-text,.progress-track{position:relative;z-index:1}
+.progress-text{font-size:clamp(21px,5vw,30px);text-align:center;line-height:1.35;font-weight:400}
+.progress-track{width:80%;height:5px;border-radius:9px;background:rgba(255,255,255,.22);margin-top:17px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:#f7f5e9;box-shadow:0 0 9px #fff;transition:width .3s}
+h2{font-weight:400;font-size:25px;margin:22px 0 13px}
+.task{display:flex;align-items:flex-start;gap:18px;padding:11px 4px;min-height:58px}
+.check{appearance:none;width:35px;height:35px;border:1.7px solid var(--ink);border-radius:50%;flex:none;margin:0;position:relative;background:transparent}
+.check:checked{background:var(--accent);border-color:var(--accent)}
+.check:checked:after{content:"✓";position:absolute;inset:0;text-align:center;color:var(--bg);font:22px Arial;line-height:32px}
+.task-main{flex:1;min-width:0}
+.task-name{font-size:clamp(20px,5vw,27px);line-height:1.3;overflow-wrap:anywhere}
+.task-name.done{text-decoration:line-through;opacity:.6}
+.sublist{padding:5px 0 0 10px}
+.subtask{display:flex;gap:10px;align-items:center;padding:5px 0;font-size:17px}
+.subtask .check{width:22px;height:22px}
+.subtask .check:checked:after{font-size:15px;line-height:20px}
+.subtask span{flex:1}
+.task-tools{display:flex;gap:7px;align-items:center}
+.tool{background:none;border:0;color:var(--ink);font-size:18px;padding:3px 5px;opacity:.8}
+.add-task{display:flex;gap:8px;margin:12px 0 20px}
+input[type=text]{min-width:0;flex:1;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:16px}
+input::placeholder{color:var(--muted)}
+.add{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.flourish{width:100%;height:55px;margin:45px 0 6px;display:block}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:var(--bg);padding:3px 18px calc(13px + env(safe-area-inset-bottom));}
+.bottom-nav:before{content:"";display:block;height:36px;margin-bottom:7px;background:center/100% 36px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 36'%3E%3Cg fill='none' stroke='%23f5f1e7' stroke-width='1.6'%3E%3Cpath d='M0 18H300Q330 18 350 5Q370 0 390 18Q400 28 410 18Q430 0 450 5Q470 18 500 18H800'/%3E%3Cpath d='M300 18q-25 -14 -35 -3q16 -4 19 8q-18 -9 -27 2q18 -2 23 7M500 18q25 -14 35 -3q-16 -4 -19 8q18 -9 27 2q-18 -2 -23 7'/%3E%3Cpath d='M385 18l15 -12 15 12 -15 12z'/%3E%3C/g%3E%3C/svg%3E")}
+.nav-row{display:flex;justify-content:space-around;align-items:center}
+.nav-btn{border:0;background:none;color:var(--ink);display:flex;align-items:center;justify-content:center;width:58px;height:48px;opacity:.9}
+.nav-btn.active{filter:drop-shadow(0 0 5px var(--shadow))}
+.nav-btn svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.view{display:none}.view.active{display:block}
+.month-title{display:flex;justify-content:space-between;align-items:center;margin:10px 0 18px}
+.month-title button{background:none;border:1px solid var(--line);border-radius:50%;width:37px;height:37px;color:var(--ink);font-size:24px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center}
+.weekday{font-size:13px;padding:6px 0;color:var(--muted)}
+.day{position:relative;border:0;background:transparent;color:var(--ink);height:42px;border-radius:50%;font-size:17px}
+.day.muted{opacity:.3}.day.selected{outline:1px solid var(--line);background:var(--panel)}
+.day.today{border:1px solid var(--line)}
+.snowberry{position:absolute;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff 0 18%,#d8d6c9 42%,#a72e35 72%);box-shadow:0 0 3px white;right:0;bottom:0}
+.stat{border:1px solid var(--line);border-radius:22px;padding:20px;margin:12px 0;background:var(--panel)}
+.stat-big{font-size:43px;margin:8px 0}
+.bar{height:8px;border-radius:10px;background:rgba(160,160,150,.25);overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent);box-shadow:0 0 7px var(--shadow)}
+.muted{color:var(--muted)}
+@media(max-height:760px){.top{height:260px}.title{top:92px}.date-wrap{top:202px}.progress-card{height:185px}}
+</style>
+</head>
+<body>
+<div class="top">
+<button class="theme-switch" id="theme">Светлая тема</button>
+<svg class="botanical" viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs><linearGradient id="leaf" x2="1" y2="1"><stop stop-color="#8c9871"/><stop offset="1" stop-color="#293f2c"/></linearGradient><radialGradient id="berry"><stop stop-color="#fff" offset="0"/><stop stop-color="#d8d5c7" offset=".25"/><stop stop-color="#b72d36" offset=".65"/><stop stop-color="#641b24" offset="1"/></radialGradient></defs>
+<g fill="none" stroke="#8a9874" stroke-width="4" opacity=".9"><path d="M-20 10Q120 100 250 5M820 0Q690 110 560 0M40 0Q100 120 180 160M760 0Q700 120 620 160"/></g>
+<g fill="url(#leaf)" stroke="#c2c4a5" stroke-width="1.4">
+<path d="M10 10Q-5 65 60 88Q78 40 10 10Z"/><path d="M75 5Q45 65 115 92Q140 43 75 5Z"/><path d="M150 0Q115 60 184 85Q210 35 150 0Z"/><path d="M225 0Q190 52 255 75Q282 30 225 0Z"/>
+<path d="M790 5Q805 65 740 88Q722 40 790 5Z"/><path d="M725 5Q755 65 685 92Q660 43 725 5Z"/><path d="M650 0Q685 60 616 85Q590 35 650 0Z"/><path d="M575 0Q610 52 545 75Q518 30 575 0Z"/>
+<path d="M5 110Q50 70 95 140Q45 160 5 110Z"/><path d="M795 110Q750 70 705 140Q755 160 795 110Z"/>
+</g>
+<g fill="url(#berry)" stroke="#e9e5d7" stroke-width="1">
+<circle cx="95" cy="45" r="12"/><circle cx="125" cy="65" r="10"/><circle cx="175" cy="35" r="13"/><circle cx="220" cy="68" r="9"/><circle cx="705" cy="45" r="12"/><circle cx="675" cy="65" r="10"/><circle cx="625" cy="35" r="13"/><circle cx="580" cy="68" r="9"/>
+<circle cx="30" cy="145" r="10"/><circle cx="65" cy="170" r="8"/><circle cx="770" cy="145" r="10"/><circle cx="735" cy="170" r="8"/>
+</g>
+<g fill="#f5f1e5" opacity=".95"><circle cx="42" cy="32" r="3"/><circle cx="145" cy="20" r="3"/><circle cx="195" cy="88" r="3"/><circle cx="755" cy="32" r="3"/><circle cx="655" cy="20" r="3"/><circle cx="605" cy="88" r="3"/><circle cx="300" cy="20" r="2"/><circle cx="500" cy="28" r="2"/><circle cx="390" cy="8" r="2"/></g>
+</svg>
+<h1 class="title">Ежедневник</h1>
+<div class="date-wrap"><span class="orn-line"></span><span class="date" id="date"></span><span class="orn-line"></span></div>
+</div>
+<main>
+<section class="view active" id="home">
+<div class="progress-card" id="progressCard"><div class="progress-text" id="progressText">Прогресс дня: выполнено 0% из 100%</div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
+<div id="tasks"></div>
+<div class="add-task"><input id="newTask" type="text" placeholder="Новая задача"><button class="add" id="addTask">+</button></div>
+</section>
+<section class="view" id="calendar">
+<div class="month-title"><button id="prev">‹</button><h2 id="month"></h2><button id="next">›</button></div>
+<div class="calendar" id="grid"></div>
+<p class="muted" style="text-align:center;font-size:15px">Заснеженные ягодки отмечают дни с выполненными делами.</p>
+</section>
+<section class="view" id="progress">
+<h2>Мой прогресс</h2><div class="stat"><div>Все подзадачи</div><div class="stat-big" id="totalPercent">0%</div><div class="bar"><i id="totalBar" style="width:0%"></i></div><p class="muted" id="totalCount"></p></div><div id="stats"></div>
+</section>
+</main>
+<nav class="bottom-nav"><div class="nav-row">
+<button class="nav-btn active" data-page="home" aria-label="Главная"><svg viewBox="0 0 32 32"><path d="M3 14 16 3l13 11v15H19v-9h-6v9H3z"/></svg></button>
+<button class="nav-btn" data-page="calendar" aria-label="Календарь"><svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="22" rx="2"/><path d="M10 3v6M22 3v6M4 12h24"/></svg></button>
+<button class="nav-btn" data-page="progress" aria-label="Прогресс"><svg viewBox="0 0 32 32"><path d="M4 27V5M4 27h25M9 21l6-7 5 4 8-11"/></svg></button>
+</div></nav>
+<script>
+const $=s=>document.querySelector(s),store='lesnoyDiaryV2';
+let data=JSON.parse(localStorage.getItem(store)||'null')||{tasks:[],theme:'dark',history:{}},monthDate=new Date();
+const today=new Date(),key=d=>`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+$('#date').textContent=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long'}).format(today);
+function save(){localStorage.setItem(store,JSON.stringify(data));render()}
+function counts(){let a=data.tasks.flatMap(t=>t.subs),d=a.filter(x=>x.done).length;return {a,d,p:a.length?Math.round(d/a.length*100):0}}
+function render(){
+ document.body.classList.toggle('light',data.theme==='light');$('#theme').textContent=data.theme==='dark'?'Светлая тема':'Тёмная тема';
+ let c=counts();$('#progressText').textContent=`Прогресс дня: выполнено ${c.p}% из 100%`;$('#progressFill').style.width=c.p+'%';$('#progressCard').style.setProperty('--progress',c.p+'%');
+ let host=$('#tasks');host.innerHTML='';
+ data.tasks.forEach(t=>{
+  let d=t.subs.filter(s=>s.done).length,p=t.subs.length?Math.round(d/t.subs.length*100):0;
+  let article=document.createElement('div');article.className='task';
+  let check=document.createElement('input');check.type='checkbox';check.className='check';check.checked=t.done;check.onchange=()=>{t.done=check.checked;save()};
+  let main=document.createElement('div');main.className='task-main';
+  let line=document.createElement('div');line.style.display='flex';line.style.alignItems='center';line.style.gap='6px';
+  let name=document.createElement('div');name.className='task-name'+(t.done?' done':'');name.textContent=t.title;
+  let tools=document.createElement('div');tools.className='task-tools';
+  let addSub=document.createElement('button');addSub.className='tool';addSub.textContent='+';addSub.title='Добавить подзадачу';addSub.onclick=()=>{let v=prompt('Название подзадачи');if(v&&v.trim()){t.subs.push({id:crypto.randomUUID(),title:v.trim(),done:false});save()}};
+  let del=document.createElement('button');del.className='tool';del.textContent='×';del.title='Удалить задачу';del.onclick=()=>{if(confirm('Удалить задачу?')){data.tasks=data.tasks.filter(x=>x.id!==t.id);save()}};
+  tools.append(addSub,del);line.append(name,tools);main.append(line);
+  if(t.subs.length){let list=document.createElement('div');list.className='sublist';t.subs.forEach(s=>{let row=document.createElement('label');row.className='subtask';let cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=s.done;cb.onchange=()=>{s.done=cb.checked;let k=key(today);data.history[k]=data.history[k]||{};data.history[k][s.id]=s.done;save()};let span=document.createElement('span');span.textContent=s.title;row.append(cb,span);list.append(row)});main.append(list)}
+  article.append(check,main);host.append(article);
+ });
+ if(!data.tasks.length)host.innerHTML='<p class="muted" style="font-size:19px">Здесь будут твои задачи…</p>';
+ $('#totalPercent').textContent=c.p+'%';$('#totalBar').style.width=c.p+'%';$('#totalCount').textContent=`Выполнено ${c.d} из ${c.a.length} подзадач`;
+ let stats=$('#stats');stats.innerHTML='';data.tasks.forEach(t=>{let n=t.subs.length,d=t.subs.filter(s=>s.done).length,p=n?Math.round(d/n*100):0;let el=document.createElement('div');el.className='stat';let title=document.createElement('div');title.style.fontSize='21px';title.textContent=t.title;let bar=document.createElement('div');bar.className='bar';let i=document.createElement('i');i.style.width=p+'%';bar.append(i);let note=document.createElement('p');note.className='muted';note.textContent=`${d} из ${n} подзадач · ${p}%`;el.append(title,bar,note);stats.append(el)});
+ renderCalendar();
+}
+function renderCalendar(){
+ $('#month').textContent=new Intl.DateTimeFormat('ru-RU',{month:'long',year:'numeric'}).format(monthDate);
+ let grid=$('#grid');grid.innerHTML='';['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].forEach(x=>{let e=document.createElement('div');e.className='weekday';e.textContent=x;grid.append(e)});
+ let first=new Date(monthDate.getFullYear(),monthDate.getMonth(),1),off=(first.getDay()+6)%7,start=new Date(monthDate.getFullYear(),monthDate.getMonth(),1-off);
+ for(let i=0;i<42;i++){let d=new Date(start);d.setDate(start.getDate()+i);let b=document.createElement('button');b.className='day'+(d.getMonth()!==monthDate.getMonth()?' muted':'')+(key(d)===key(today)?' today':'');b.textContent=d.getDate();if(data.history[key(d)]&&Object.values(data.history[key(d)]).some(Boolean)){let berry=document.createElement('i');berry.className='snowberry';b.append(berry)}grid.append(b)}
+}
+$('#addTask').onclick=()=>{let v=$('#newTask').value.trim();if(!v)return;data.tasks.push({id:crypto.randomUUID(),title:v,done:false,subs:[]});$('#newTask').value='';save()};
+$('#newTask').addEventListener('keydown',e=>{if(e.key==='Enter')$('#addTask').click()});
+$('#theme').onclick=()=>{data.theme=data.theme==='dark'?'light':'dark';save()};
+$('#prev').onclick=()=>{monthDate.setMonth(monthDate.getMonth()-1);renderCalendar()};$('#next').onclick=()=>{monthDate.setMonth(monthDate.getMonth()+1);renderCalendar()};
+document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.page).classList.add('active')});
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();
+</script>
+</body></html>
